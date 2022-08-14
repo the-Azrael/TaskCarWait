@@ -5,8 +5,8 @@ import java.util.*;
 public class Main {
     private static final int MS_AS_ONE_DAY = 100;
     private static final int MAX_DAYS = 7;
-    private static final List<Car> cars = new LinkedList<>();
-    private static final int MAX_CARS = 10;
+    private static final List<Car> cars = new ArrayList<>();
+    private static final int MAX_CARS = 5;
 
     private static Model getRandomModel() {
         Random random = new Random();
@@ -21,8 +21,8 @@ public class Main {
 
     private static Thread getThreadCarArrival() {
         return new Thread(() -> {
-             synchronized (cars) {
-                while (cars.size() < MAX_CARS) {
+            while (cars.size() < MAX_CARS) {
+                synchronized (cars) {
                     Car car = new Car(getRandomModel(), LocalDate.now());
                     cars.add(car);
                     System.out.println("Поступил автомобиль " + " " + car);
@@ -41,22 +41,23 @@ public class Main {
         return new Thread(() -> {
             boolean hasBuy = false;
             int visitCount = 1;
+            String threadName = Thread.currentThread().getName();
             synchronized (cars) {
-                System.out.println("Покупатель " + buyerID + " пришел в магазин в " + visitCount + " раз");
                 visitCount++;
-                while(!hasBuy || visitCount > 2) {
+                while(!hasBuy) {
+                    System.out.println(threadName + ": "  + " Зашел в автосалон");
                     if (cars.isEmpty()) {
-                        System.out.println("Покупатель " + buyerID + " увидел, что машин нет");
+                        System.out.println(threadName + ": "  + " Машин нет");
                         try {
                             cars.wait();
                         } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
+                            e.printStackTrace(System.out);
                         }
                     } else {
                         hasBuy = true;
                         Car car = cars.get(0);
                         cars.remove(car);
-                        System.out.println("Покупатель " + buyerID +" купил машину " + car);
+                        System.out.println(threadName + ": "  + " уехал на машине " + car);
                     }
                 }
             }
@@ -64,12 +65,17 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        List<Thread> clients = new ArrayList<>();
         for (int i = 1; i < MAX_CARS + 1; i++) {
-            Thread buy = getThreadCarBuy(i);
-            buy.start();
+            Thread client = getThreadCarBuy(i);
+            client.setName("Покупатель" + i);
+            clients.add(client);
         }
         Thread arrival = getThreadCarArrival();
         arrival.start();
+        for (Thread client : clients) {
+            client.start();
+        }
     }
 
 }
