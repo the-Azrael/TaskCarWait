@@ -4,9 +4,10 @@ import java.util.*;
 
 public class Main {
     private static final int MS_AS_ONE_DAY = 100;
-    private static final int MAX_DAYS = 7;
+    private static final int MS_AS_WAIT = 100;
+    private static final int MAX_DAYS = 5;
     private static final List<Car> cars = new ArrayList<>();
-    private static final int MAX_CARS = 5;
+    private static final int MAX_CARS = 10;
 
     private static Model getRandomModel() {
         Random random = new Random();
@@ -40,15 +41,18 @@ public class Main {
     private static Thread getThreadCarBuy(int buyerID) {
         return new Thread(() -> {
             boolean hasBuy = false;
-            int visitCount = 1;
             String threadName = Thread.currentThread().getName();
             synchronized (cars) {
-                visitCount++;
                 while(!hasBuy) {
                     System.out.println(threadName + ": "  + " Зашел в автосалон");
                     if (cars.isEmpty()) {
                         System.out.println(threadName + ": "  + " Машин нет");
                         try {
+                            try {
+                                Thread.sleep(MS_AS_WAIT);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace(System.out);
+                            }
                             cars.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace(System.out);
