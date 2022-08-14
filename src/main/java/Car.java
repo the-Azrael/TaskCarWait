@@ -2,11 +2,9 @@ import java.time.LocalDate;
 
 public class Car {
     private Model model;
-    private LocalDate produceDate;
 
-    public Car(Model model, LocalDate produceDate) {
+    public Car(Model model) {
         this.model = model;
-        this.produceDate = produceDate;
     }
 
     public Model getModel() {
@@ -18,7 +16,4 @@ public class Car {
         return this.getModel().getProducer().getName() + " " + this.getModel().getName();
     }
 
-    public LocalDate getProduceDate() {
-        return produceDate;
-    }
 }

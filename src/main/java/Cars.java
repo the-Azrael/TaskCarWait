@@ -1,7 +1,12 @@
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Cars extends HashMap {
-    public static int id = 1;
+public class Cars {
+    private List<Car> cars = new ArrayList<>();
     public Cars() {
+    }
+
+    public List<Car> getCars() {
+        return cars;
     }
 }
